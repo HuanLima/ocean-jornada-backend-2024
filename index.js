@@ -16,7 +16,7 @@ const lista = ["Rick Sanchez", "Morty Smith", "Summer Smith"]
 // Endpoint Read All -> [GET] /item
 app.get("/item", function (req, res) {
     // Envio a lista inteira como resposta HTTP
-    res.send(lista)
+    res.send(lista.filter(Boolean))
 })
 
 // Endpoint Read by ID -> [GET] /item/:id
@@ -66,7 +66,7 @@ app.put("/item/:id", function (req, res) {
 app.delete("/item/:id", function (req, res) {
     // Obtemos o ID do parâmetro da rota
     const id = req.params.id
-    
+
     // Removemos da lista o item associado ao ID recebido pela variável id
     delete lista[id - 1]
 
