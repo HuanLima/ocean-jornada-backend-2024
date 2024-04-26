@@ -53,16 +53,15 @@ async function main() {
     app.use(express.json())
 
     // Endpoint Create -> [POST] /item
-    app.post("/item", function (req, res) {
-        // Extraímos o item através do corpo da requisição HTTP.
-        // No objeto JSON, pegamos o nome(string) que foi enviado dentro do corpo da requisição HTTP.
-        const item = req.body.nome
+    app.post("/item", async function (req, res) {
+        // Extraímos o item através do corpo da requisição HTTP
+        const item = req.body
 
-        // Adicionamos o nome obtido na lista de itens
-        lista.push(item)
+        // Adicionamos o item obtido na collection
+        await collection.insertOne(item)
 
-        // Exibimos uma resposta de sucesso
-        res.send("Item adicionado com sucesso: " + item)
+        // Exibimos o item adicionado
+        res.send(item)
     } )
 
     // Endpoint Update -> [PUT] /item/:id
