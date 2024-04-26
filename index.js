@@ -1,77 +1,95 @@
 const express = require("express")
-const app = express()
+const { MongoClient } = require("mongodb")
 
-app.get("/", function (req, res) {
-    res.send("Hello, world!")
-})
+const dbUrl = "mongodb+srv://admin:FWfwo8fbKKshA38f@cluster0.gukz2p9.mongodb.net/"
+const dbName = "ocean-jornada-backend-2024"
 
-app.get("/oi", function (req, res) {
-    res.send("Olá, mundo!")
-})
+async function main() {
+    console.log("Conectando ao banco de dados ...")
+    const client = new MongoClient(dbUrl)
+    await client.connect()
+    console.log("Banco de dados conectado com sucesso!")
+    const app = express()
 
-// Lista de personagens
-const lista = ["Rick Sanchez", "Morty Smith", "Summer Smith"]
-//                  0                1               2
+    // Endpoint [GET] / que exibe: "Hello, world!"
+    app.get("/", function (req, res) {
+        res.send("Hello, world!")
+    })
 
-// Endpoint Read All -> [GET] /item
-app.get("/item", function (req, res) {
-    // Envio a lista inteira como resposta HTTP
-    res.send(lista.filter(Boolean))
-})
+    // Endpoint [GET] /oi que exibe: "Olá, mundo!"
+    app.get("/oi", function (req, res) {
+        res.send("Olá, mundo!")
+    })
 
-// Endpoint Read by ID -> [GET] /item/:id
-app.get("/item/:id", function (req, res) {
-    // Acesso o ID no parâmetro de rota
-    const id = req.params.id
+    // Lista de personagens
+    const lista = ["Rick Sanchez", "Morty Smith", "Summer Smith"]
+    //                  0                1               2
 
-    // Acesso um item na lista com base no ID recebido (usando o "id-1"), e coloco este item na variável item
-    const item = lista[id - 1]
+    const db = client.db(dbName)
+    const collection = db.collection("item")
 
-    // Envio o item obtido como resposta HTTP
-    res.send(item)
-} )
+    // Endpoint Read All -> [GET] /item
+    app.get("/item", function (req, res) {
+        // Envio a lista inteira como resposta HTTP
+        res.send(lista.filter(Boolean))
+    })
 
-// Sinalizamos que o corpo da requisição HTTP está em JSON
-app.use(express.json())
+    // Endpoint Read by ID -> [GET] /item/:id
+    app.get("/item/:id", function (req, res) {
+        // Acesso o ID no parâmetro de rota
+        const id = req.params.id
 
-// Endpoint Create -> [POST] /item
-app.post("/item", function (req, res) {
-    // Extraímos o item através do corpo da requisição HTTP.
-    // No objeto JSON, pegamos o nome(string) que foi enviado dentro do corpo da requisição HTTP.
-    const item = req.body.nome
+        // Acesso um item na lista com base no ID recebido (usando o "id-1"), e coloco este item na variável item
+        const item = lista[id - 1]
 
-    // Adicionamos o nome obtido na lista de itens
-    lista.push(item)
+        // Envio o item obtido como resposta HTTP
+        res.send(item)
+    } )
 
-    // Exibimos uma resposta de sucesso
-    res.send("Item adicionado com sucesso: " + item)
-} )
+    // Sinalizamos que o corpo da requisição HTTP está em JSON
+    app.use(express.json())
 
-// Endpoint Update -> [PUT] /item/:id
-app.put("/item/:id", function (req, res) {
-    // Obtemos o ID do parâmetro de rota
-    const id = req.params.id
+    // Endpoint Create -> [POST] /item
+    app.post("/item", function (req, res) {
+        // Extraímos o item através do corpo da requisição HTTP.
+        // No objeto JSON, pegamos o nome(string) que foi enviado dentro do corpo da requisição HTTP.
+        const item = req.body.nome
 
-    // Obtemos o corpo da requisição HTTP para sabermos qual o novo valor
-    const novoItem = req.body.nome
+        // Adicionamos o nome obtido na lista de itens
+        lista.push(item)
 
-    // Atualizamos o novo item (com o seu novo valor) na lista
-    lista[id - 1] = novoItem
+        // Exibimos uma resposta de sucesso
+        res.send("Item adicionado com sucesso: " + item)
+    } )
 
-    // Exibimos uma mensagem de sucesso
-    res.send("Item atualizado com sucesso: " + id + " . Novo valor do item: " + novoItem)
-})
+    // Endpoint Update -> [PUT] /item/:id
+    app.put("/item/:id", function (req, res) {
+        // Obtemos o ID do parâmetro de rota
+        const id = req.params.id
 
-// Endpoint Delete -> [DELETE] /item/:id
-app.delete("/item/:id", function (req, res) {
-    // Obtemos o ID do parâmetro da rota
-    const id = req.params.id
+        // Obtemos o corpo da requisição HTTP para sabermos qual o novo valor
+        const novoItem = req.body.nome
 
-    // Removemos da lista o item associado ao ID recebido pela variável id
-    delete lista[id - 1]
+        // Atualizamos o novo item (com o seu novo valor) na lista
+        lista[id - 1] = novoItem
 
-    // Exibimos uma mensagem de sucesso
-    res.send("Item removido com sucesso:" + id)
-})
+        // Exibimos uma mensagem de sucesso
+        res.send("Item atualizado com sucesso: " + id + " . Novo valor do item: " + novoItem)
+    })
 
-app.listen(3000)
+    // Endpoint Delete -> [DELETE] /item/:id
+    app.delete("/item/:id", function (req, res) {
+        // Obtemos o ID do parâmetro da rota
+        const id = req.params.id
+
+        // Removemos da lista o item associado ao ID recebido pela variável id
+        delete lista[id - 1]
+
+        // Exibimos uma mensagem de sucesso
+        res.send("Item removido com sucesso:" + id)
+    })
+
+    app.listen(3000)
+}
+
+main()
