@@ -35,7 +35,7 @@ async function main() {
         const itens = await collection.find().toArray()
 
         // Enviamos como resposta HTTP
-        res.send(itens)
+        res.status(200).send(itens)
     })
 
     // Endpoint Read by ID -> [GET] /item/:id
@@ -46,8 +46,12 @@ async function main() {
         // Acesso um item na collection (usando o "ObjectId"), e coloco este item na variável item
         const item = await collection.findOne( {_id: new ObjectId(id)} )
 
+        if(!item){
+            return res.status(404).send("Item não encontrado!")
+        }
+
         // Envio o item obtido como resposta HTTP
-        res.send(item)
+        res.status(200).send(item)
     } )
 
     // Sinalizamos que o corpo da requisição HTTP está em JSON
