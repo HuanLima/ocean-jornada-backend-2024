@@ -1,6 +1,7 @@
 require("dotenv").config()
 const express = require("express")
 const { MongoClient, ObjectId } = require("mongodb")
+const cors = require("cors")
 
 const dbUrl = process.env.DATABASE_URL
 const dbName = "ocean-jornada-backend-2024"
@@ -11,6 +12,8 @@ async function main() {
     await client.connect()
     console.log("Banco de dados conectado com sucesso!")
     const app = express()
+
+    app.use(cors())
 
     // Endpoint [GET] / que exibe: "Hello, world!"
     app.get("/", function (req, res) {
