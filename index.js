@@ -65,8 +65,12 @@ async function main() {
         // Adicionamos o item obtido na collection
         await collection.insertOne(item)
 
+        if(!item || !item.nome){
+            res.status(400).send("Corpo da requisição sem o campo 'name'!")
+        }
+
         // Exibimos o item adicionado
-        res.send(item)
+        res.status(201).send(item)
     } )
 
     // Endpoint Update -> [PUT] /item/:id
